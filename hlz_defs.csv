@@ -1,0 +1,42 @@
+abt,tap,per,veg_class
+0,0,0,none
+0.75,62.5,0.5,desert
+0.75,125,0.25,desert
+0.75,250,0.125,desert
+1.5,62.5,1,dry tundra
+1.5,125,0.5,moist tundra
+1.5,250,0.25,wet tundra
+1.5,500,0.125,rain tundra
+3,62.5,2,desert
+3,125,1,dry scrub
+3,250,0.5,moist forest
+3,500,0.25,wet forest
+3,1000,0.125,rain forest
+6,62.5,4,desert
+6,125,2,desert scrub
+6,250,1,steppe
+6,500,0.5,moist forest
+6,1000,0.25,wet forest
+6,2000,0.125,rain forest
+12,62.5,8,desert
+12,125,4,desert scrub
+12,250,2,thorn steppe
+12,500,1,dry forest
+12,1000,0.5,moist forest
+12,2000,0.25,wet forest
+12,4000,0.125,rain forest
+24,62.5,16,desert
+24,125,8,desert scrub
+24,250,4,thorn woodland
+24,500,2,very dry forest
+24,1000,1,dry forest
+24,2000,0.5,moist forest
+24,4000,0.25,wet forest
+24,8000,0.125,rain forest
+12,62.5,8,desert
+12,125,4,desert scrub
+12,250,2,thorn woodland
+12,500,1,dry forest
+12,1000,0.5,moist forest
+12,2000,0.25,wet forest
+12,4000,0.125,rain forest
