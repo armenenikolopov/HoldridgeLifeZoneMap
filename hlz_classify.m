@@ -39,27 +39,30 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Define Constants
-min_prec = 62.5;                   % Minimum annual precipitation (mm)
-max_prec = 16000;                  % Maximum annual precipitation (mm)
+% All of these min/max values are adjusted by a factor of 4 to account for
+% extension of the holdridge life zone map by 2 hexagons to the left and 2 
+% to the right
+min_prec = 62.5/4;                   % Minimum annual precipitation (mm)
+max_prec = 16000*4;                  % Maximum annual precipitation (mm)
 
-min_abt = 1.5;                     % Lower bound for biotemperature = polar/nivial desert
-max_abt = 30;                      % Upper bound for biotemperature
+min_abt = 1.5/4;                     % Lower bound for biotemperature = polar/nivial desert
+max_abt = 30*4;                      % Upper bound for biotemperature
 
-min_petrat = 0.125;                % Minimum PET–precip ratio
-max_petrat = 32;                   % Maximum PET–precip ratio
+min_petrat = 0.125/4;                % Minimum PET–precip ratio
+max_petrat = 32*4;                   % Maximum PET–prsecip ratio
 
 no_data_code = 0;                  % Value for areas with no input data
 out_of_bounds_code = 1;            % Value for areas outside HLZ parameters
-polar_desert_vegclass = 3;         % Veg class (not code) index for polar/nivial desert
+polar_desert_vegclass = 5;         % Veg class (not code) index for polar/nivial desert
 
 
 % Indices in hlz_defs for specific zones, allows us to have warm tropical
 % and subtropical zones, one hexagon split in half. 
 frost_line = 2^(log2(12) + 0.5);        % midpoint of 12 and 24 in log space, splits subtropical and warm temperate
-subtropical_index_offset = uint16(15);  % offset to convert warm temperate -> subtropical
-warm_temp_desert_index = 20;           % index for warm temperate desert
-warm_temp_rain_forest_index = 26;      % index for warm temperate rain forest
-tropical_rain_forest_index = 34;       % last zone we consider for distance calc
+subtropical_index_offset = uint32(23);  % offset to convert warm temperate -> subtropical
+warm_temp_desert_index = 36;           % index for warm temperate ultra-arid desert
+warm_temp_rain_forest_index = 46;      % index for warm temperate saturated rain forest
+tropical_rain_forest_index = 58;       % last zone we consider for distance calc (saturated rain forest)
 
 %% Compute PET–Precipitation Ratio
 petrat = pet ./ prec;
@@ -79,7 +82,7 @@ zone_centers = zone_centers(1:tropical_rain_forest_index, :);
 % We do this in four chunks to avoid memory overload for large rasters.
 
 % Initialize the result array (HLZ index) 
-closest_zone_index = zeros(21600, 43200, 'uint16');
+closest_zone_index = zeros(size(abt,1), size(abt,2), 'uint32');
 
 log_zone_centers = [ ...
     log2(zone_centers(:,1)/0.75), ...
@@ -144,14 +147,14 @@ toc;
 % and the local temperature is above the frost_line, offset the zone index
 % by subtropical_index_offset.
 veg_class_i = closest_zone_index ...
-    + uint16(closest_zone_index >= warm_temp_desert_index ...
+    + uint32(closest_zone_index >= warm_temp_desert_index ...
              & closest_zone_index <= warm_temp_rain_forest_index ...
              & abt > frost_line) * subtropical_index_offset;
 
 %% Determine Latitudinal Bands (No Elevation Correction)
 % 1 = polar, 2 = subpolar, 3 = boreal, 4 = cool temp, 5 = warm temp,
 % 6 = subtropical, 7 = tropical
-lat_band_local = zeros(size(abt), 'uint16');
+lat_band_local = zeros(size(abt), 'uint32');
 lat_band_local(abt <= 1.5)                    = 1; % polar
 lat_band_local(abt >= 1.5 & abt < 3)          = 2; % subpolar
 lat_band_local(abt >= 3   & abt < 6)          = 3; % boreal
@@ -164,7 +167,7 @@ lat_band_local(abt >= 24)                     = 7; % tropical
 alt_band_local = lat_band_local;
 
 %% Determine Sea-Level Latitudinal Bands
-lat_band_sealevel = zeros(size(abt_sealevel), 'uint16');
+lat_band_sealevel = zeros(size(abt_sealevel), 'uint32');
 lat_band_sealevel(abt_sealevel <= 1.5)                              = 1; 
 lat_band_sealevel(abt_sealevel >= 1.5 & abt_sealevel < 3)           = 2; 
 lat_band_sealevel(abt_sealevel >= 3   & abt_sealevel < 6)           = 3; 
@@ -229,7 +232,7 @@ end
 
 %% Polar & Out-of-Bounds Mask
 % Mark anything below min_abt or in those polar hex indices as polar desert.
-mask_polar = (abt <= min_abt | veg_class_i == 2 | veg_class_i == 3 | veg_class_i == 4) & ~mask_nodata;
+mask_polar = (abt <= min_abt | (veg_class_i >= 2 & veg_class_i <= 8)) & ~mask_nodata;
 
 % Out-of-bounds mask: precipitation or ratio outside modeled range 
 mask_out_of_bounds = (prec < min_prec | prec >= max_prec | ...
@@ -245,10 +248,10 @@ eco_tones(mask_polar) = 0;  % No transitional ecotones in polar deserts
 %   [3 digits for veg_class_i | 1 digit for altitude_band | 1 digit for lat_band | 1 digit for ecotone]
 % To implement, we do 1000 * veg_class_i + 100 * altitude_band + 10 * lat_band + ecotone
 total_hlz_eco = ...
-    1000 * uint16(veg_class_i) + ...
-     100 * uint16(final_alt_band) + ...
-      10 * uint16(final_lat_band) + ...
-           uint16(eco_tones);
+    1000 * uint32(veg_class_i) + ...
+     100 * uint32(final_alt_band) + ...
+      10 * uint32(final_lat_band) + ...
+           uint32(eco_tones);
 
 % Mark nodata and out-of-bounds
 total_hlz_eco(mask_nodata)     = no_data_code;

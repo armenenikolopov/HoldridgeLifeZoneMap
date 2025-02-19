@@ -12,8 +12,6 @@
 % 
 % Significant code is in hlz_classify.m 
 
-%Location for WorldClim2.1 & Aridity Index data. 
-data_dir_base = '/users/armen/Data/HLZ_Data/';
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -26,18 +24,22 @@ output_dir = './data_calculated/';
 if ~exist(output_dir,'dir')
     mkdir(output_dir);
 end
+elev_path = "/Volumes/T7 Shield/Data/GMTED2010/mean/GMTED_mosaic_clipped.tif"; 
 
-%calculate parameters for model. Only needs to be done once, saves to
-%output_dir
-calc_biotemp_and_precip
+
+%%%%% COMMENTED OUT BECAUSE IT TAKES 2 HOURS TO RUN. RUN ONCE  %%%%%%%%%%%
+%     calculate_params   
+%%%%% COMMENTED OUT BECAUSE IT TAKES 2 HOURS TO RUN. RUN ONCE  %%%%%%%%%%%
 
 %% Read HLZ Definitions
 hlz_defs= readtable('./hlz_defs.csv');
-[abt,georef] = readgeoraster(fullfile(output_dir,"biotemp_annual.tif"));
+make_chelsa_georef;   %load geo ref for saving geotiffs. 
+
+abt = readgeoraster(fullfile(output_dir,"biotemp_annual.tif"));
 abt_sealevel = readgeoraster(fullfile(output_dir,"biotemp_sealevel_annual.tif"));
 prec = readgeoraster(fullfile(output_dir,"prec_annual.tif"));
 mask_nodata = readgeoraster(fullfile(output_dir,"nodata_mask.tif"),"OutputType","logical");
-elev = readgeoraster(fullfile(data_dir_base,"WorldClim2.1","wc2.1_30s_elev.tif"));
+elev = readgeoraster(elev_path);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %calculate holdridge life zones using Holdridge's evapotranspiration estim.
@@ -52,7 +54,7 @@ hlz_classify    %run classifier code
 clearvars -except hlz_defs abt abt_sealevel prec mask_nodata georef output_dir data_dir_base elev
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %calculate HLZ using Penman-Monteith - unique to PM methods.
-pet = single(readgeoraster(fullfile(data_dir_base,"et0_v3_yr.tif")));  %data from Global Aridity Index
+pet = single(readgeoraster(fullfile(output_dir,"pet_annual.tif")));  %data from Global Aridity Index
 do_calculate_ecotones = false;    %don't calculate transitional zones for Penman-Monteith HLZ
 fname = fullfile(output_dir, 'HLZ_Penman-Monteith.tif');
 disp("Calculating Penman-Monteith-adjusted Holdridge life zones. ")

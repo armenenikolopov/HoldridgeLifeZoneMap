@@ -74,10 +74,10 @@ end
 %       LAT_BAND    = floor(mod(code, 100) / 10)
 %       ECOTONE     = mod(code, 10)
 %---------------------------------------------------------------------------
-veg_class_i = int16(idivide(int32(code), 1000, 'floor'));        % Vegetation class index
-alt_band    = int16(idivide(mod(int32(code), 1000), 100, 'floor')); % Altitudinal band
-lat_band    = int16(idivide(mod(int32(code), 100), 10, 'floor'));    % Latitudinal band
-ecotone     = int16(mod(int32(code), 10));                           % Ecotone indicator
+veg_class_i = int32(idivide(int32(code), 1000, 'floor'));        % Vegetation class index
+alt_band    = int32(idivide(mod(int32(code), 1000), 100, 'floor')); % Altitudinal band
+lat_band    = int32(idivide(mod(int32(code), 100), 10, 'floor'));    % Latitudinal band
+ecotone     = int32(mod(int32(code), 10));                           % Ecotone indicator
 
 %---------------------------------------------------------------------------
 % Define Descriptive Names for Each Zone Component
