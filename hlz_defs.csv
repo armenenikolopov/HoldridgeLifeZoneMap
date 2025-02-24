@@ -3,7 +3,7 @@ index,belt,abt,tap,per,veg_class
 2,1,0.75,15.625,2,semiarid desert (unused)
 3,1,0.75,31.25,1,subhumid desert (unused)
 4,1,0.75,62.5,0.5,humid desert (unused)
-5,1,0.75,125,0.25,perhumid desert
+5,1,0.75,125,0.25,desert
 6,1,0.75,250,0.125,superhumid desert (unused)
 7,1,0.75,500,0.0625,semisaturated desert (unused)
 8,1,0.75,1000,0.03125,subsaturated desert (unused)

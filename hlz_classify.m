@@ -282,7 +282,8 @@ total_hlz_eco(mask_out_of_bounds) = out_of_bounds_code;
 
 
 %% Write GeoTIFF (With Ecotones)
-geotiffwrite(fname, total_hlz_eco, georef);
+tags.Compression = Tiff.Compression.LZW;
+geotiffwrite(fname, total_hlz_eco, georef,'TiffTags',tags);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % End of script
