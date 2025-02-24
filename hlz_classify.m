@@ -26,12 +26,12 @@
 %       ecotones if do_calculate_ecotones is true.
 %
 % The HLZ code is encoded in base-10 as follows
-%       [ 2 digits for veg_class_i | 1 digit for altitude_band | 1 digit for latitudinal_band | 1 digit for ecotone ]
+%       [ 2 digits for veg_class_i | 1 digit for altitude_belt | 1 digit for latitudinal_belt | 1 digit for ecotone ]
 %
 % Example: a code like 19263 means:
 %       - veg_class_i = 19
-%       - altitude_band = 2
-%       - latitudinal_band = 6
+%       - altitude_belt = 2
+%       - latitudinal_belt = 6
 %       - ecotone = 3
 %
 % Areas outside model bounds are set to out_of_bounds_code.
@@ -66,6 +66,8 @@ tropical_rain_forest_index = 58;       % last zone we consider for distance calc
 
 %% Compute PET–Precipitation Ratio
 petrat = pet ./ prec;
+mask_nodata(prec == 0) = true;  % petrat == NaN at these places, b/c of division by 0 
+
 clear pet;  % No longer needed, delete to save memory. 
 
 zone_edges = single([hlz_defs.abt, hlz_defs.tap, hlz_defs.per]);
@@ -91,6 +93,7 @@ log_zone_centers = [ ...
 ];
 
 % We use 1-based indexing in MATLAB, so define row/col chunks:
+% 21600,43200 for WorldClim, 20880,43200 for CHELSA. 
 row_len = size(abt,1); 
 col_len = size(abt,2); 
 
@@ -151,50 +154,75 @@ veg_class_i = closest_zone_index ...
              & closest_zone_index <= warm_temp_rain_forest_index ...
              & abt > frost_line) * subtropical_index_offset;
 
-%% Determine Latitudinal Bands (No Elevation Correction)
+%% Polar & Out-of-Bounds Mask
+% Mark anything below min_abt or in those polar hex indices as polar desert.
+mask_polar = (abt <= min_abt | (veg_class_i >= 2 & veg_class_i <= 8)) & ~mask_nodata;
+
+%% Out-of-bounds mask: precipitation or ratio outside modeled range 
+mask_out_of_bounds = (prec < min_prec | prec >= max_prec | ...
+                      petrat < min_petrat | petrat >= max_petrat) ...
+                     & ~mask_polar & ~mask_nodata;
+
+
+
+% Assign polar desert to polar areas. 
+%This needs to be done at soe point for veg_class_i >=2 and <=8, but also
+%needs to be done now for abt==0, which to now have NaN veg_class_i because
+%log transformation of temp data leads to log 0 = NaN. 
+veg_class_i(mask_polar) = polar_desert_vegclass;
+
+%% Determine Latitudinal/ Altitudinal Belts (No Elevation Correction) from saved data
 % 1 = polar, 2 = subpolar, 3 = boreal, 4 = cool temp, 5 = warm temp,
 % 6 = subtropical, 7 = tropical
-lat_band_local = zeros(size(abt), 'uint32');
-lat_band_local(abt <= 1.5)                    = 1; % polar
-lat_band_local(abt >= 1.5 & abt < 3)          = 2; % subpolar
-lat_band_local(abt >= 3   & abt < 6)          = 3; % boreal
-lat_band_local(abt >= 6   & abt < 12)         = 4; % cool temperate
-lat_band_local(abt >= 12  & abt < frost_line) = 5; % warm temperate
-lat_band_local(abt >= frost_line & abt < 24)  = 6; % subtropical
-lat_band_local(abt >= 24)                     = 7; % tropical
 
-%% Determine "Local Altitudinal" Band (Initially same as lat_band_local)
-alt_band_local = lat_band_local;
+belt_local = zeros(size(veg_class_i), 'uint32');
 
-%% Determine Sea-Level Latitudinal Bands
-lat_band_sealevel = zeros(size(abt_sealevel), 'uint32');
-lat_band_sealevel(abt_sealevel <= 1.5)                              = 1; 
-lat_band_sealevel(abt_sealevel >= 1.5 & abt_sealevel < 3)           = 2; 
-lat_band_sealevel(abt_sealevel >= 3   & abt_sealevel < 6)           = 3; 
-lat_band_sealevel(abt_sealevel >= 6   & abt_sealevel < 12)          = 4; 
-lat_band_sealevel(abt_sealevel >= 12  & abt_sealevel < frost_line)  = 5; 
-lat_band_sealevel(abt_sealevel >= frost_line & abt_sealevel < 24)   = 6; 
-lat_band_sealevel(abt_sealevel >= 24)                               = 7; 
+% abt~=0 check because mask_out_bounds does not include abt=0 (because abt<=min_abt is in
+% polar mask), but abt==0 kills the find-nearest-neighbor algorithm because
+% it works on log-transformed data, i.e., log(0), which is undefined. 
+belt_local (~mask_nodata & ~mask_out_of_bounds) =uint32(hlz_defs.belt(veg_class_i(~mask_nodata & ~mask_out_of_bounds)));
 
-%% Final Latitudinal Band = Sea-level Lat Band
-% If the local alt band differs from sea level, we consider it a non-basal band.
-final_lat_band = lat_band_sealevel;
-zone_shifters = (lat_band_local ~= lat_band_sealevel);
-clear lat_band_sealevel;
 
-%% Final Altitudinal Band
+
+%% Determine Sea-Level Latitudinal Belts
+belt_sealevel = zeros(size(abt_sealevel), 'uint32');
+belt_sealevel(abt_sealevel <= 1.5)                              = 1; 
+belt_sealevel(abt_sealevel >= 1.5 & abt_sealevel < 3)           = 2; 
+belt_sealevel(abt_sealevel >= 3   & abt_sealevel < 6)           = 3; 
+belt_sealevel(abt_sealevel >= 6   & abt_sealevel < 12)          = 4; 
+belt_sealevel(abt_sealevel >= 12  & abt_sealevel < frost_line)  = 5; 
+belt_sealevel(abt_sealevel >= frost_line & abt_sealevel < 24)   = 6; 
+belt_sealevel(abt_sealevel >= 24)                               = 7; 
+
+%% Final Latitudinal Belt = Sea-level Lat Belt
+% If the local alt belt differs from sea level, we consider it a non-basal belt.
+final_lat_belt = max(belt_sealevel,belt_local);   %  This is for areas in the top transitional zone that poke into the next cooler zone. Those areas are treated as though they belong to the warmer zone. 
+
+
+% > rather than ~= means that sealevel areas in 'cool' transitional zones 
+% reaching into the next-cooler belt are treated as basal. Rare occurence,
+% but still needs to be noted. 
+zone_shifters = (belt_local < belt_sealevel);
+clear belt_sealevel;
+
+%% Final Altitudinal Belt
 % 1 = nival, 2 = alpine, 3 = subalpine, 4 = montane, 5 = premontane,
 % 6 = lower montane, 7 = basal
-% (Here we simply store the local alt band if it differs from sea level, 
+% (Here we simply store the local alt belt if it differs from sea level, 
 %  otherwise 7=basal.)
-final_alt_band = uint8(7 * ones(size(abt)));
-final_alt_band(zone_shifters) = uint8(alt_band_local(zone_shifters));
+final_alt_belt = uint8(7 * ones(size(abt)));
+final_alt_belt(zone_shifters) = uint8(belt_local(zone_shifters));
+
+
+
+%I FIXED IT, nnz(veg_class_i(~mask_nodata & ~mask_out_of_bounds)==0) ==0!!!!
 
 %% Manage Edge Cases and Ecotones
 % If veg_class_i == 0, it indicates no match (rare); set it to 1 (avoid zeros).
 % outside of things mask_polar and maskn_nodata, this catches some small amount of 
 % Andean and Himalayan territory.
-veg_class_i(veg_class_i == 0) = 1;
+
+%veg_class_i(veg_class_i == 0) = 1;
 
 
 
@@ -216,6 +244,12 @@ prec_edges = hlz_defs.tap;
 petrat_edges = hlz_defs.per; 
 abt_edges = hlz_defs.abt;
 
+
+%for ease of calculation in the below, we deal with areas that have
+%veg_class_i == 0. Set them to 1, they will be ignored as they are all
+%mask_nodata or mask_out_of_bounds. 
+veg_class_i(veg_class_i == 0) = 1;
+
 % Precipitation ecotones
 eco_tones(prec < prec_edges(veg_class_i)) = 7; 
 eco_tones(prec > 2.^(log2(prec_edges(veg_class_i))+1)) = 4;
@@ -230,27 +264,16 @@ eco_tones(abt > 2.^(log2(abt_edges(veg_class_i))+1)) = 5;
 
 end
 
-%% Polar & Out-of-Bounds Mask
-% Mark anything below min_abt or in those polar hex indices as polar desert.
-mask_polar = (abt <= min_abt | (veg_class_i >= 2 & veg_class_i <= 8)) & ~mask_nodata;
-
-% Out-of-bounds mask: precipitation or ratio outside modeled range 
-mask_out_of_bounds = (prec < min_prec | prec >= max_prec | ...
-                      petrat < min_petrat | petrat >= max_petrat) ...
-                     & ~mask_polar & ~mask_nodata;
-
-% Assign polar desert to polar areas
-veg_class_i(mask_polar) = polar_desert_vegclass;
 eco_tones(mask_polar) = 0;  % No transitional ecotones in polar deserts
 
 %% Build Final HLZ Code
 % Code format (4 digits):
-%   [3 digits for veg_class_i | 1 digit for altitude_band | 1 digit for lat_band | 1 digit for ecotone]
-% To implement, we do 1000 * veg_class_i + 100 * altitude_band + 10 * lat_band + ecotone
+%   [3 digits for veg_class_i | 1 digit for altitude_belt | 1 digit for lat_belt | 1 digit for ecotone]
+% To implement, we do 1000 * veg_class_i + 100 * altitude_belt + 10 * lat_belt + ecotone
 total_hlz_eco = ...
-    1000 * uint32(veg_class_i) + ...
-     100 * uint32(final_alt_band) + ...
-      10 * uint32(final_lat_band) + ...
+    10000 * uint32(final_lat_belt) + ...
+     1000 * uint32(final_alt_belt) + ...
+      10 * uint32(veg_class_i) + ...
            uint32(eco_tones);
 
 % Mark nodata and out-of-bounds

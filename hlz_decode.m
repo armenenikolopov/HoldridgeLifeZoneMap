@@ -15,8 +15,8 @@ function str = hlz_decode(vegdefs, code)
 %                       2 = alpine  
 %                       3 = subalpine  
 %                       4 = montane  
-%                       5 = premontane  
-%                       6 = lower montane  
+%                       5 = lower montane  
+%                       6 = premontane  
 %                       7 = basal
 %       LAT_BAND    : Latitudinal band index:
 %                       1 = polar  
@@ -74,9 +74,9 @@ end
 %       LAT_BAND    = floor(mod(code, 100) / 10)
 %       ECOTONE     = mod(code, 10)
 %---------------------------------------------------------------------------
-veg_class_i = int32(idivide(int32(code), 1000, 'floor'));        % Vegetation class index
-alt_band    = int32(idivide(mod(int32(code), 1000), 100, 'floor')); % Altitudinal band
-lat_band    = int32(idivide(mod(int32(code), 100), 10, 'floor'));    % Latitudinal band
+lat_band = int32(idivide(int32(code), 10000, 'floor'));        % Vegetation class index
+alt_band    = int32(idivide(mod(int32(code), 10000), 1000, 'floor')); % Altitudinal band
+veg_class_i    = int32(idivide(mod(int32(code), 1000), 10, 'floor'));    % Latitudinal band
 ecotone     = int32(mod(int32(code), 10));                           % Ecotone indicator
 
 %---------------------------------------------------------------------------
@@ -101,8 +101,8 @@ altBandNames = { ...
     'alpine ', ...
     'subalpine ', ...
     'montane ', ...
-    'premontane ', ...
     'lower montane ', ...
+    'premontane ', ...
     '' ...
 };
 

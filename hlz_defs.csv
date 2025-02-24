@@ -1,70 +1,70 @@
-index,abt,tap,per,veg_class
-1,0,0,0,none
-2,0.75,15.625,2,desert
-3,0.75,31.25,1,desert
-4,0.75,62.5,0.5,desert
-5,0.75,125,0.25,desert
-6,0.75,250,0.125,desert
-7,0.75,500,0.0625,desert
-8,0.75,1000,0.03125,desert
-9,1.5,15.625,4,arid dry tundra
-10,1.5,31.25,2,semiarid dry tundra
-11,1.5,62.5,1,dry tundra
-12,1.5,125,0.5,moist tundra
-13,1.5,250,0.25,wet tundra
-14,1.5,500,0.125,rain tundra
-15,1.5,1000,0.0625,sub-saturated rain tundra
-16,1.5,2000,0.03125,saturated rain tundra
-17,3,15.625,8,perarid desert
-18,3,31.25,4,arid desert
-19,3,62.5,2,desert
-20,3,125,1,dry scrub
-21,3,250,0.5,moist forest
-22,3,500,0.25,wet forest
-23,3,1000,0.125,rain forest
-24,3,2000,0.0625,sub-saturated rain forest
-25,3,4000,0.03125,saturated rain forest
-26,6,15.625,16,superarid desert
-27,6,31.25,8,perarid desert
-28,6,62.5,4,desert
-29,6,125,2,desert scrub
-30,6,250,1,steppe
-31,6,500,0.5,moist forest
-32,6,1000,0.25,wet forest
-33,6,2000,0.125,rain forest
-34,6,4000,0.0625,sub-saturated rain forest
-35,6,8000,0.03125,saturated rain forest
-36,12,15.625,32,ultra-arid desert
-37,12,31.25,16,superarid desert
-38,12,62.5,8,desert
-39,12,125,4,desert scrub
-40,12,250,2,thorn steppe
-41,12,500,1,dry forest
-42,12,1000,0.5,moist forest
-43,12,2000,0.25,wet forest
-44,12,4000,0.125,rain forest
-45,12,8000,0.0625,sub-saturated rain forest
-46,12,16000,0.03125,saturated rain forest
-47,24,15.625,64,mega-arid desert
-48,24,31.25,32,ultra-arid desert
-49,24,62.5,16,desert
-50,24,125,8,desert scrub
-51,24,250,4,thorn woodland
-52,24,500,2,very dry forest
-53,24,1000,1,dry forest
-54,24,2000,0.5,moist forest
-55,24,4000,0.25,wet forest
-56,24,8000,0.125,rain forest
-57,24,16000,0.0625,sub-saturated rain forest
-58,24,32000,0.03125,saturated rain forest
-59,12,15.625,32,ultra-arid desert
-60,12,31.25,16,superarid desert
-61,12,62.5,8,desert
-62,12,125,4,desert scrub
-63,12,250,2,thorn steppe
-64,12,500,1,dry forest
-65,12,1000,0.5,moist forest
-66,12,2000,0.25,wet forest
-67,12,4000,0.125,rain forest
-68,12,8000,0.0625,sub-saturated rain forest
-69,12,16000,0.03125,saturated rain forest
+index,belt,abt,tap,per,veg_class
+1,0,0,0,0,none
+2,1,0.75,15.625,2,semiarid desert (unused)
+3,1,0.75,31.25,1,subhumid desert (unused)
+4,1,0.75,62.5,0.5,humid desert (unused)
+5,1,0.75,125,0.25,perhumid desert
+6,1,0.75,250,0.125,superhumid desert (unused)
+7,1,0.75,500,0.0625,semisaturated desert (unused)
+8,1,0.75,1000,0.03125,subsaturated desert (unused)
+9,2,1.5,15.625,4,arid dry tundra
+10,2,1.5,31.25,2,semiarid dry tundra
+11,2,1.5,62.5,1,dry tundra
+12,2,1.5,125,0.5,moist tundra
+13,2,1.5,250,0.25,wet tundra
+14,2,1.5,500,0.125,rain tundra
+15,2,1.5,1000,0.0625,semisaturated rain tundra
+16,2,1.5,2000,0.03125,subsaturated rain tundra
+17,3,3,15.625,8,perarid desert
+18,3,3,31.25,4,arid desert
+19,3,3,62.5,2,desert
+20,3,3,125,1,dry scrub
+21,3,3,250,0.5,moist forest
+22,3,3,500,0.25,wet forest
+23,3,3,1000,0.125,rain forest
+24,3,3,2000,0.0625,semisaturated rain forest
+25,3,3,4000,0.03125,subsaturated rain forest
+26,4,6,15.625,16,superarid desert
+27,4,6,31.25,8,perarid desert
+28,4,6,62.5,4,desert
+29,4,6,125,2,desert scrub
+30,4,6,250,1,steppe
+31,4,6,500,0.5,moist forest
+32,4,6,1000,0.25,wet forest
+33,4,6,2000,0.125,rain forest
+34,4,6,4000,0.0625,semisaturated rain forest
+35,4,6,8000,0.03125,subsaturated rain forest
+36,5,12,15.625,32,ultra-arid desert
+37,5,12,31.25,16,superarid desert
+38,5,12,62.5,8,desert
+39,5,12,125,4,desert scrub
+40,5,12,250,2,thorn steppe
+41,5,12,500,1,dry forest
+42,5,12,1000,0.5,moist forest
+43,5,12,2000,0.25,wet forest
+44,5,12,4000,0.125,rain forest
+45,5,12,8000,0.0625,semisaturated rain forest
+46,5,12,16000,0.03125,subsaturated rain forest
+47,7,24,15.625,64,mega-arid desert
+48,7,24,31.25,32,ultra-arid desert
+49,7,24,62.5,16,desert
+50,7,24,125,8,desert scrub
+51,7,24,250,4,thorn woodland
+52,7,24,500,2,very dry forest
+53,7,24,1000,1,dry forest
+54,7,24,2000,0.5,moist forest
+55,7,24,4000,0.25,wet forest
+56,7,24,8000,0.125,rain forest
+57,7,24,16000,0.0625,semisaturated rain forest
+58,7,24,32000,0.03125,subsaturated rain forest
+59,6,12,15.625,32,ultra-arid desert
+60,6,12,31.25,16,superarid desert
+61,6,12,62.5,8,desert
+62,6,12,125,4,desert scrub
+63,6,12,250,2,thorn woodland
+64,6,12,500,1,dry forest
+65,6,12,1000,0.5,moist forest
+66,6,12,2000,0.25,wet forest
+67,6,12,4000,0.125,rain forest
+68,6,12,8000,0.0625,semisaturated rain forest
+69,6,12,16000,0.03125,subsaturated rain forest
